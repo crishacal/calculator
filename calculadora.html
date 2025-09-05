@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="calculadora.css">
+    <title>Calculadora</title>
+</head>
+
+<body>
+    <section class="calculadora">
+        <input type="text" id="display" readonly autofocus>
+        <div class="button">
+            <button onclick="apagarDisplay()">C</button>
+            <button onclick="addValorDisplay(')')">(</button>
+            <button onclick="addValorDisplay('(')">)</button>
+            <button onclick="addValorDisplay('/')">/</button>
+            <button onclick="addValorDisplay('7')">7</button>
+            <button onclick="addValorDisplay('8')">8</button>
+            <button onclick="addValorDisplay('9')">9</button>
+            <button onclick="addValorDisplay('*')">x</button>
+            <button onclick="addValorDisplay('4')">4</button>
+            <button onclick="addValorDisplay('5')">5</button>
+            <button onclick="addValorDisplay('6')">6</button>
+            <button onclick="addValorDisplay('-')">-</button>
+            <button onclick="addValorDisplay('1')">1</button>
+            <button onclick="addValorDisplay('2')">2</button>
+            <button onclick="addValorDisplay('3')">3</button>
+            <button onclick="addValorDisplay('+')">+</button>
+            <button onclick="addValorDisplay('0')">0</button>
+            <button onclick="addValorDisplay('.')">.</button>
+            <button onclick="deletar()" class="delete">&#x232B;</button>
+            <button onclick="calcular()" class="equal">=</button>
+        </div>
+    </section>
+
+   <script src="main.js"></script>
+</body>
+
+</html>
