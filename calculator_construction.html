@@ -1,0 +1,160 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+    <style>
+        #display.erro {
+            color: red;
+        }
+        #display {
+            width: 200px;
+            padding: 10px;
+            font-size: 18px;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <input type="text" id="display" readonly>
+    <div>
+        <button onclick="calc.addValorDisplay('1')">1</button>
+        <button onclick="calc.addValorDisplay('2')">2</button>
+        <button onclick="calc.addValorDisplay('3')">3</button>
+        <button onclick="calc.addValorDisplay('+')">+</button>
+    </div>
+    <div>
+        <button onclick="calc.addValorDisplay('4')">4</button>
+        <button onclick="calc.addValorDisplay('5')">5</button>
+        <button onclick="calc.addValorDisplay('6')">6</button>
+        <button onclick="calc.addValorDisplay('-')">-</button>
+    </div>
+    <div>
+        <button onclick="calc.addValorDisplay('7')">7</button>
+        <button onclick="calc.addValorDisplay('8')">8</button>
+        <button onclick="calc.addValorDisplay('9')">9</button>
+        <button onclick="calc.addValorDisplay('*')">*</button>
+    </div>
+    <div>
+        <button onclick="calc.addValorDisplay('0')">0</button>
+        <button onclick="calc.addValorDisplay('/')">/</button>
+        <button onclick="calc.calcular()">=</button>
+        <button onclick="calc.deletar()">DEL</button>
+        <button onclick="calc.apagarDisplay()">C</button>
+    </div>
+
+    <script>
+        function Calculadora() {
+            this.display = document.getElementById('display');
+            if (!this.display) {
+                console.error('Elemento #display não encontrado.');
+                return;
+            }
+            this.inicializarEventos();
+        }
+
+        Calculadora.prototype.inicializarEventos = function() {
+            this.display.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    this.calcular();
+                }
+            });
+            this.display.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    this.apagarDisplay();
+                }
+            });
+        };
+
+        Calculadora.prototype.addValorDisplay = function(valor) {
+            if (this.display) {
+                this.display.value += valor;
+                this.display.classList.remove('erro');
+                this.display.focus();
+            } else {
+                console.error("Elemento #display não encontrado.");
+            }
+        };
+
+        Calculadora.prototype.apagarDisplay = function() {
+            if (this.display) {
+                this.display.value = '';
+                this.display.classList.remove('erro');
+            } else {
+                console.error('Elemento #display não encontrado.');
+            }
+        };
+
+        Calculadora.prototype.deletar = function() {
+            if (this.display) {
+                this.display.value = this.display.value.slice(0, -1);
+                this.display.classList.remove('erro');
+            } else {
+                console.error('Elemento #display não encontrado.');
+            }
+        };
+
+        Calculadora.prototype.calcular = function() {
+            if (this.display) {
+                try {
+                    this.display.value = eval(this.display.value);
+                    this.display.classList.remove('erro');
+                } catch (erro) {
+                    this.display.value = 'Erro';
+                    this.display.classList.add('erro');
+                }
+            } else {
+                console.error('Elemento #display não encontrado.');
+            }
+        };
+
+        // Criar instância da calculadora
+        const calc = new Calculadora();
+    </script>
+</body>
+</html>
